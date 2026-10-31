@@ -1,11 +1,12 @@
 /* 个人工作台 · 离线缓存（让添加到桌面后断网也能打开） */
-const CACHE = 'pink-workbench-v2';
+const CACHE = 'pink-workbench-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './icon-maskable-512.png'
 ];
 
 self.addEventListener('install', e => {
