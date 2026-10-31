@@ -1,5 +1,5 @@
 /* 个人工作台 · 离线缓存（让添加到桌面后断网也能打开） */
-const CACHE = 'pink-workbench-v1';
+const CACHE = 'pink-workbench-v2';
 const ASSETS = [
   './',
   './index.html',
