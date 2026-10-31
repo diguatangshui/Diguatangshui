@@ -630,6 +630,8 @@ table.mini td{padding:7px 4px;border-bottom:1px dashed #F6DDE2}
 <div class="modal-mask" id="setModal">
   <div class="modal">
     <h3 style="font-size:18px;color:var(--text-strong);margin-bottom:14px">⚙️ 设置</h3>
+    <button class="btn" id="installBtn" style="display:none;background:var(--olive)" onclick="doInstall()">📲 安装到桌面（独立图标）</button>
+    <div id="installHint" class="hint" style="background:#FFF6F8;border:1px solid #F7DDE3;border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.7;font-size:13px">检测安装条件…</div>
     <p class="hint" style="margin:0 0 14px">所有数据均保存在本机浏览器中，不会上传到任何服务器。每次打开会自动读取历史数据，任何改动都会立即自动保存。</p>
     <div id="saveStatus" class="hint" style="background:#FFF6F8;border:1px solid #F7DDE3;border-radius:12px;padding:11px 12px;margin:0 0 14px;line-height:1.7;font-size:13px"></div>
     <h3 style="font-size:16px;margin:0 0 10px">☁️ 云端同步（多设备 + 云端备份）</h3>
@@ -1922,6 +1924,45 @@ async function restoreCloudVersion(ts){
     toast('已恢复到该版本 ✅');
   }catch(e){ toast('恢复失败'); }
 }
+
+/* ==================== 添加到桌面（PWA 安装） ==================== */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  const b = document.getElementById('installBtn'); if(b) b.style.display = 'block';
+  updateInstallHint();
+});
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  const b = document.getElementById('installBtn'); if(b) b.style.display = 'none';
+  toast('已添加到桌面 🎉'); updateInstallHint();
+});
+function doInstall(){
+  if(!deferredPrompt){ toast('当前浏览器未触发安装，请用菜单「添加到主屏幕」'); return; }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(c => { deferredPrompt = null; updateInstallHint(); });
+}
+function updateInstallHint(){
+  const el = document.getElementById('installHint'); if(!el) return;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if(standalone){ el.innerHTML = '✅ 已经以桌面应用方式运行'; return; }
+  if(deferredPrompt){
+    el.innerHTML = '✅ <b>可以安装</b>：点上面按钮，或 Chrome 菜单里的「安装应用」。<br>安装后是独立图标、全屏、断网可用。';
+    return;
+  }
+  const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  if(isiOS){
+    el.innerHTML = '🍎 iPhone 请用 <b>Safari</b> 打开本页 → 底部「分享」→「添加到主屏幕」（Chrome for iOS 无此功能）。';
+    return;
+  }
+  el.innerHTML = '⚠️ 浏览器暂未弹出安装提示，常见原因：<br>'
+    + '· 之前已用「添加到主屏幕」建过<b>旧快捷方式</b> → 先长按桌面删除它，再刷新本页重试<br>'
+    + '· 用了<b>无痕模式</b>或微信/QQ 内置浏览器 → 换正常窗口的 Chrome<br>'
+    + '· Chrome 版本过旧 → 应用商店更新<br>'
+    + '· 页面停留过短 → 停留十秒、翻几下页面再刷新<br>'
+    + '（临时方案：菜单「添加到主屏幕」也能生成桌面入口，只是带地址栏）';
+}
+setTimeout(updateInstallHint, 1200);
 
 /* ==================== 备份导入导出 ==================== */
 function exportData(){
