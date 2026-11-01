@@ -1955,6 +1955,14 @@ function updateInstallHint(){
     el.innerHTML = '🍎 iPhone 请用 <b>Safari</b> 打开本页 → 底部「分享」→「添加到主屏幕」（Chrome for iOS 无此功能）。';
     return;
   }
+  const ua = navigator.userAgent;
+  if(/Quark|UCBrowser|UCWEB/i.test(ua)){
+    el.innerHTML = '🧭 <b>夸克 / UC 浏览器</b>：不支持 PWA 安装，请用菜单生成桌面入口。<br>'
+      + '路径：底部或右上角「⋯ 菜单」→ <b>添加到桌面</b>（或「添加到主屏幕」）→ 确认。<br>'
+      + '生成的是桌面快捷方式，<b>功能与数据完全一致</b>，只是打开时带地址栏。<br>'
+      + '若想获得独立图标 + 全屏 + 断网可用，请用 <b>Chrome</b> 打开同一网址再安装。';
+    return;
+  }
   el.innerHTML = '⚠️ 浏览器暂未弹出安装提示，常见原因：<br>'
     + '· 之前已用「添加到主屏幕」建过<b>旧快捷方式</b> → 先长按桌面删除它，再刷新本页重试<br>'
     + '· 用了<b>无痕模式</b>或微信/QQ 内置浏览器 → 换正常窗口的 Chrome<br>'
